@@ -1,0 +1,17 @@
+{
+  "name": "bharat-super-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bharat Super App — Mobile (React Native) and Web (React) as separate apps with separate node_modules.",
+  "scripts": {
+    "install:mobile": "npm install --prefix apps/mobile",
+    "install:web": "npm install --prefix apps/web",
+    "install:all": "npm run install:mobile && npm run install:web",
+    "mobile": "npm run start --prefix apps/mobile",
+    "web": "npm run dev --prefix apps/web",
+    "build:web": "npm run build --prefix apps/web"
+  },
+  "keywords": ["bharat", "super-app", "react-native", "expo", "react"],
+  "author": "Bharat Super App",
+  "license": "UNLICENSED"
+}
