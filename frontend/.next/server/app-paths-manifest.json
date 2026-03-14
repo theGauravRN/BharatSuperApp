@@ -1,8 +1,0 @@
-{
-  "/[locale]/(dashboard)/social/page": "app/[locale]/(dashboard)/social/page.js",
-  "/[locale]/(dashboard)/fintech/page": "app/[locale]/(dashboard)/fintech/page.js",
-  "/[locale]/(dashboard)/home/page": "app/[locale]/(dashboard)/home/page.js",
-  "/[locale]/(dashboard)/ev-green/page": "app/[locale]/(dashboard)/ev-green/page.js",
-  "/[locale]/(dashboard)/agri/page": "app/[locale]/(dashboard)/agri/page.js",
-  "/[locale]/(dashboard)/shop/page": "app/[locale]/(dashboard)/shop/page.js"
-}

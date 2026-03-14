@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Heart, Activity, FlaskConical, Pill, Brain, Ambulance, IdCard, Star, MapPin, BadgeCheck, Video, Phone, CalendarDays, ChevronRight, Syringe } from 'lucide-react';
+import { Heart, Activity, FlaskConical, Pill, Brain, Ambulance, CreditCard, Star, MapPin, BadgeCheck, Video, Phone, CalendarDays, ChevronRight, Syringe } from 'lucide-react';
 
 const DOCTORS = [
   { id: 1, name: 'Dr. Priya Sharma',  spec: 'General Physician', rating: 4.9, reviews: 1240, exp: '12 yrs', fee: 299, available: 'Today 3:00 PM', lang: 'Hindi, English', img: 'https://randomuser.me/api/portraits/women/44.jpg', verified: true },
@@ -45,7 +45,7 @@ export default function HealthPage() {
           </div>
           {/* ABDM card */}
           <div className="mt-3 flex items-center gap-2 rounded-xl bg-white/20 px-3 py-2 backdrop-blur-sm">
-            <IdCard size={18} className="text-white flex-shrink-0" />
+            <CreditCard size={18} className="text-white flex-shrink-0" />
             <div>
               <p className="text-white text-xs font-semibold">ABDM Health ID Linked</p>
               <p className="text-white/70 text-[10px]">rahul.verma@abdm · All records synced</p>

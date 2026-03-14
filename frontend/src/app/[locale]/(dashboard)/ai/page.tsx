@@ -1,287 +1,183 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import { Mic, MicOff, Send, Volume2, Globe, RotateCcw, Sparkles, MessageCircle, HelpCircle } from 'lucide-react';
 
-type Message = {
-  id: number;
-  role: 'user' | 'assistant';
-  text: string;
-  lang?: string;
-  module?: string;
-  actions?: { label: string; href: string }[];
-  time: string;
-};
-
-const SAMPLE_CONVERSATIONS: Message[] = [
-  {
-    id: 1, role: 'user', text: 'Aaj mandi mein gehun ka kya rate chal raha hai?', lang: 'Hindi',
-    time: '10:02 AM',
-  },
-  {
-    id: 2, role: 'assistant', module: '🌾 Agri-Tech',
-    text: 'आज जयपुर मंडी में गेहूँ का भाव ₹2,180 प्रति क्विंटल है। यह कल से ₹30 ज़्यादा है। अलवर मंडी में ₹2,200 मिल रहा है जो सबसे अच्छा भाव है।\n\n📊 Top 3 Mandis Today:\n• Alwar: ₹2,200/qtl ⬆️\n• Jaipur: ₹2,180/qtl ⬆️\n• Ajmer: ₹2,160/qtl ➡️',
-    actions: [{ label: 'See All Mandi Prices', href: '/hi/agri' }, { label: 'Sell My Produce', href: '/hi/agri' }],
-    time: '10:02 AM',
-  },
-  {
-    id: 3, role: 'user', text: 'Doctor se milna hai, sir mein dard ho raha hai', lang: 'Hindi',
-    time: '10:05 AM',
-  },
-  {
-    id: 4, role: 'assistant', module: '🏥 HealthTech',
-    text: 'आपको सिरदर्द है। मैं अभी उपलब्ध डॉक्टर दिखाता हूँ:\n\n👨‍⚕️ Dr. Priya Sharma (General Physician)\n⭐ 4.9 · ₹299 · Available now\n🗣️ Hindi, English\n\nक्या मैं अभी अपॉइंटमेंट बुक करूँ?',
-    actions: [{ label: '📹 Book Video Consultation', href: '/hi/health' }, { label: 'See More Doctors', href: '/hi/health' }],
-    time: '10:05 AM',
-  },
-  {
-    id: 5, role: 'user', text: 'Paisa bhejna hai mujhe 500 rupaye Ramesh ko', lang: 'Hindi',
-    time: '10:08 AM',
-  },
-  {
-    id: 6, role: 'assistant', module: '💰 FinTech',
-    text: 'ठीक है! मैं Ramesh को ₹500 UPI से भेज सकता हूँ।\n\n📤 Payment Details:\n• Receiver: Ramesh Kumar\n• UPI: ramesh.kumar@upi\n• Amount: ₹500\n• Method: UPI\n\nक्या आप confirm करना चाहते हैं?',
-    actions: [{ label: '✅ Confirm & Send ₹500', href: '/hi/fintech' }, { label: 'Change Amount', href: '/hi/fintech' }],
-    time: '10:08 AM',
-  },
+const SAMPLE_CONVS = [
+  { role: 'user', text: 'Mera ration card kaise nikale?' },
+  { role: 'ai',   text: '📋 आपके ration card के लिए:\n1. BharatApp → GovTech → DigiLocker जाएं\n2. "Ration Card" खोजें\n3. Aadhaar से verify करें\n4. PDF download करें\n\nGovTech module में डायरेक्ट जाना चाहते हैं? [हाँ, ले जाओ]' },
+  { role: 'user', text: 'Aaj ke gehun ka mandi rate kya hai?' },
+  { role: 'ai',   text: '🌾 आज के मंडी भाव (14 मार्च 2026):\n\n• **गेहूँ (Wheat)**: ₹2,180/क्विंटल 📈 +₹30\n• **सरसों (Mustard)**: ₹5,100/क्विंटल\n• **सोयाबीन**: ₹4,200/क्विंटल\n\n**Jaipur Mandi** में आज volume: 12,500 quintal\n\nपूरे मंडी भाव देखने के लिए Agri-Tech module में जाएं? 🌾' },
 ];
 
-const SUGGESTED_QUERIES = [
-  { text: 'आज मौसम कैसा है?', label: 'Weather', icon: '🌤️', module: 'agri' },
-  { text: 'Mera UPI balance kitna hai?', label: 'Balance', icon: '💰', module: 'fintech' },
-  { text: 'UPSC exam ki preparation kaise karu?', label: 'Education', icon: '📚', module: 'edtech' },
-  { text: 'Mere gaon mein naukri chahiye', label: 'Jobs', icon: '💼', module: 'jobs' },
-  { text: 'Sarkar ki yojana ke liye apply karna hai', label: 'GovTech', icon: '🏛️', module: 'govtech' },
-  { text: 'Bijli ka bill kaise bhaaru?', label: 'Bill Pay', icon: '⚡', module: 'fintech' },
+const SUGGESTIONS = [
+  { icon: '💰', text: 'Mera balance kya hai?' },
+  { icon: '🌾', text: 'Aaj ke mandi rate?' },
+  { icon: '🏥', text: 'Doctor book karna hai' },
+  { icon: '📋', text: 'Ration card kaise milega?' },
+  { icon: '📱', text: 'Mobile recharge karo' },
+  { icon: '🏛️', text: 'Kisan scheme batao' },
+  { icon: '🚗', text: 'EV loan ke baare mein batao' },
+  { icon: '📰', text: 'Aaj ki top news' },
 ];
 
-const LANGUAGES = [
-  { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'ta', name: 'தமிழ்', flag: '🌐' },
-  { code: 'te', name: 'తెలుగు', flag: '🌐' },
-  { code: 'bn', name: 'বাংলা', flag: '🌐' },
-  { code: 'mr', name: 'मराठी', flag: '🌐' },
-  { code: 'gu', name: 'ગુજરાતી', flag: '🌐' },
-  { code: 'kn', name: 'ಕನ್ನಡ', flag: '🌐' },
-];
+const LANGS = ['हिंदी', 'English', 'বাংলা', 'தமிழ்', 'తెలుగు', 'मराठी', 'ਪੰਜਾਬੀ', 'ગુજરાતી', 'ಕನ್ನಡ', 'മലയാളം', 'অসমীয়া'];
 
-const AI_RESPONSES: Record<string, Message['text']> = {
-  default: "मैं आपकी मदद करने के लिए तैयार हूँ! आप मुझसे खेती, स्वास्थ्य, पैसा, नौकरी, पढ़ाई — कुछ भी पूछ सकते हैं।\n\nI'm ready to help you! Ask me about farming, health, money, jobs, education — anything!",
-};
+type Msg = { role: 'user' | 'ai'; text: string };
 
-export default function AIAssistantPage() {
-  const [messages, setMessages] = useState<Message[]>(SAMPLE_CONVERSATIONS);
-  const [inputText, setInputText] = useState('');
-  const [isListening, setIsListening] = useState(false);
-  const [selectedLang, setSelectedLang] = useState('hi');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+export default function AIPage() {
+  const [msgs, setMsgs] = useState<Msg[]>(SAMPLE_CONVS as Msg[]);
+  const [input, setInput] = useState('');
+  const [listening, setListening] = useState(false);
+  const [lang, setLang] = useState('हिंदी');
+  const [speaking, setSpeaking] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs]);
 
-  const sendMessage = (text?: string) => {
-    const msg = text || inputText.trim();
+  const sendMsg = (text?: string) => {
+    const msg = text || input.trim();
     if (!msg) return;
-
-    const userMsg: Message = {
-      id: Date.now(),
-      role: 'user',
-      text: msg,
-      lang: LANGUAGES.find(l => l.code === selectedLang)?.name,
-      time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages(prev => [...prev, userMsg]);
-    setInputText('');
-    setIsTyping(true);
-
+    setInput('');
+    const newMsgs: Msg[] = [...msgs, { role: 'user', text: msg }];
+    setMsgs(newMsgs);
     setTimeout(() => {
-      const aiMsg: Message = {
-        id: Date.now() + 1,
-        role: 'assistant',
-        text: AI_RESPONSES.default,
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages(prev => [...prev, aiMsg]);
-      setIsTyping(false);
-    }, 1500);
+      setMsgs(m => [...m, { role: 'ai', text: `🤖 Processing your request in ${lang}...\n\nYour query: "${msg}"\n\nI am Bharat AI — your personal assistant for all 13 BharatApp modules. How can I help you further?` }]);
+    }, 1000);
   };
 
   const toggleListening = () => {
-    setIsListening(!isListening);
-    if (!isListening) {
+    setListening(!listening);
+    if (!listening) {
       setTimeout(() => {
-        setIsListening(false);
-        sendMessage('आज मंडी में गेहूँ का क्या भाव है?');
-      }, 3000);
+        setListening(false);
+        setInput('Doctor dikhana hai kal subah');
+      }, 2000);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-bharat-navy overflow-hidden">
+    <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-bharat-saffron via-orange-500 to-bharat-orange px-4 py-3 flex-shrink-0">
+      <div className="border-b border-orange-100/60 bg-white/80 px-4 py-3 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-900/80">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center text-2xl">🎤</div>
-          <div className="flex-1">
-            <p className="font-bold text-white">Bharat AI Assistant</p>
-            <p className="text-xs text-white/80">बोलो भारत — 22 languages</p>
+          <div className="relative h-10 w-10">
+            <Image src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=80&q=80" alt="AI" width={40} height={40} className="h-10 w-10 rounded-full object-cover ring-2 ring-bharat-saffron/40" />
+            {speaking && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-green-400 ring-2 ring-white animate-pulse" />}
           </div>
-          {/* Language selector */}
-          <select
-            value={selectedLang}
-            onChange={e => setSelectedLang(e.target.value)}
-            className="bg-white/20 border border-white/30 text-white text-xs rounded-lg px-2 py-1.5 outline-none backdrop-blur"
-          >
-            {LANGUAGES.map(lang => (
-              <option key={lang.code} value={lang.code} className="text-gray-800 bg-white">
-                {lang.name}
-              </option>
-            ))}
-          </select>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h1 className="font-bold text-gray-900 dark:text-white">Bharat AI</h1>
+              <Sparkles size={14} className="text-bharat-saffron" />
+            </div>
+            <p className="text-xs text-gray-400">22 Indian languages · Voice-first</p>
+          </div>
+          {/* Language picker */}
+          <div className="ml-auto flex items-center gap-2">
+            <Globe size={15} className="text-gray-400" />
+            <select value={lang} onChange={e => setLang(e.target.value)} className="rounded-lg border border-orange-100 bg-orange-50/50 px-2 py-1 text-xs font-medium text-gray-700 outline-none dark:border-gray-700 dark:bg-white/5 dark:text-gray-200">
+              {LANGS.map(l => <option key={l}>{l}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {/* Welcome banner */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/10 rounded-2xl p-4 border border-orange-200 dark:border-orange-800 text-center">
-          <p className="text-3xl mb-2">🎤</p>
-          <p className="font-bold text-gray-900 dark:text-white">नमस्ते! मैं आपका AI सहायक हूँ</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">बोलिए या टाइप करिए — किसी भी भाषा में</p>
-          <p className="text-xs text-gray-400 mt-1">हिंदी, English, தமிழ், తెలుగు, বাংলা and 17 more languages</p>
-        </div>
-
-        {/* Suggested queries */}
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Try asking:</p>
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTED_QUERIES.map(q => (
-              <button
-                key={q.text}
-                onClick={() => sendMessage(q.text)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-700 dark:text-gray-300 hover:border-bharat-saffron hover:text-bharat-saffron transition shadow-sm"
-              >
-                <span>{q.icon}</span>
-                <span className="font-medium">{q.text}</span>
-              </button>
-            ))}
+      {/* Chat area */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        {/* AI intro card */}
+        <div className="mb-6 overflow-hidden rounded-2xl shadow-md">
+          <div className="relative h-36">
+            <Image src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80" alt="AI" fill className="object-cover opacity-60" />
+            <div className="absolute inset-0 flex flex-col justify-center bg-gradient-to-r from-bharat-navy/90 to-indigo-800/80 p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles size={18} className="text-bharat-saffron" />
+                <p className="font-black text-white">Bolo Bharat AI</p>
+              </div>
+              <p className="text-white/80 text-sm">बोलिए किसी भी भाषा में — मैं समझता हूँ</p>
+              <p className="text-white/60 text-xs mt-1">Understands Hindi, English & 20 more Indian languages</p>
+            </div>
           </div>
         </div>
 
         {/* Chat messages */}
-        {messages.map(msg => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} gap-2`}>
-            {msg.role === 'assistant' && (
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-bharat-saffron to-bharat-orange flex items-center justify-center text-sm flex-shrink-0 mt-1">
-                🤖
-              </div>
-            )}
-            <div className={`max-w-xs sm:max-w-md lg:max-w-lg ${msg.role === 'user' ? 'order-first' : ''}`}>
-              {msg.module && (
-                <p className="text-xs text-bharat-saffron font-semibold mb-1 ml-1">{msg.module}</p>
-              )}
-              <div
-                className={`rounded-2xl px-4 py-3 ${
-                  msg.role === 'user'
-                    ? 'bg-bharat-saffron text-white rounded-tr-sm'
-                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm rounded-tl-sm border border-gray-100 dark:border-gray-700'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-line leading-relaxed">{msg.text}</p>
-                {msg.lang && (
-                  <p className="text-xs mt-1 opacity-60">🗣️ {msg.lang}</p>
-                )}
-              </div>
-              {/* Action buttons */}
-              {msg.actions && (
-                <div className="flex flex-wrap gap-2 mt-2 ml-1">
-                  {msg.actions.map(action => (
-                    <a
-                      key={action.label}
-                      href={action.href}
-                      className="text-xs px-3 py-1.5 rounded-full bg-orange-50 dark:bg-orange-900/20 text-bharat-saffron border border-orange-200 dark:border-orange-800 font-medium hover:bg-orange-100 transition"
-                    >
-                      {action.label}
-                    </a>
-                  ))}
+        <div className="mx-auto max-w-2xl space-y-3">
+          {msgs.map((msg, i) => (
+            <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {msg.role === 'ai' && (
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-bharat-saffron to-bharat-orange">
+                  <Sparkles size={14} className="text-white" />
                 </div>
               )}
-              <p className={`text-xs mt-1 text-gray-400 ${msg.role === 'user' ? 'text-right' : 'ml-1'}`}>{msg.time}</p>
-            </div>
-            {msg.role === 'user' && (
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-gray-500 to-gray-700 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-1">
-                R
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* Typing indicator */}
-        {isTyping && (
-          <div className="flex gap-2 items-center">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-bharat-saffron to-bharat-orange flex items-center justify-center text-sm flex-shrink-0">🤖</div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100 dark:border-gray-700">
-              <div className="flex gap-1 items-center h-4">
-                <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${msg.role === 'user' ? 'rounded-tr-sm bg-bharat-saffron text-white' : 'rounded-tl-sm bg-white/90 ring-1 ring-orange-100/60 dark:bg-white/10 dark:ring-white/10'}`}>
+                {msg.role === 'ai' ? (
+                  <div className="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-line leading-relaxed">
+                    {msg.text.split('**').map((t, j) => j % 2 ? <strong key={j}>{t}</strong> : t)}
+                  </div>
+                ) : (
+                  <p className="text-sm text-white">{msg.text}</p>
+                )}
+                {msg.role === 'ai' && (
+                  <button onClick={() => setSpeaking(!speaking)} className="mt-2 flex items-center gap-1 text-[11px] text-gray-400 hover:text-bharat-saffron transition">
+                    <Volume2 size={12} /> {speaking ? 'Playing...' : 'Listen'}
+                  </button>
+                )}
               </div>
             </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+          ))}
+          <div ref={bottomRef} />
+        </div>
       </div>
 
-      {/* Input area */}
-      <div className="flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
-        {/* Voice listening indicator */}
-        {isListening && (
-          <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 rounded-xl px-4 py-2.5 mb-3 border border-red-200 dark:border-red-800">
-            <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-            <p className="text-red-600 dark:text-red-400 text-sm font-medium">Listening... बोलिए</p>
-            <button onClick={() => setIsListening(false)} className="ml-auto text-xs text-red-500 font-medium">Stop</button>
-          </div>
-        )}
+      {/* Suggestions */}
+      <div className="border-t border-orange-100/40 bg-white/70 backdrop-blur-sm dark:border-gray-700/40 dark:bg-gray-900/70">
+        <div className="flex gap-2 overflow-x-auto px-4 py-2.5">
+          {SUGGESTIONS.map(s => (
+            <button
+              key={s.text}
+              onClick={() => sendMsg(s.text)}
+              className="flex flex-shrink-0 items-center gap-1.5 rounded-full border border-orange-100/60 bg-orange-50/80 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-orange-100 hover:border-bharat-saffron/40 transition dark:border-gray-700 dark:bg-white/5 dark:text-gray-400"
+            >
+              <span>{s.icon}</span>{s.text}
+            </button>
+          ))}
+        </div>
 
-        <div className="flex items-center gap-2">
-          {/* Voice button */}
+        {/* Input bar */}
+        <div className="flex items-center gap-2 px-4 pb-4 pt-2">
           <button
             onClick={toggleListening}
-            className={`h-12 w-12 flex-shrink-0 rounded-full flex items-center justify-center text-xl shadow-md transition ${
-              isListening
-                ? 'bg-red-500 text-white animate-pulse'
-                : 'bg-gradient-to-br from-bharat-saffron to-bharat-orange text-white hover:opacity-90'
-            }`}
+            className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl transition ${listening ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse' : 'bg-orange-50 text-bharat-saffron hover:bg-orange-100 dark:bg-white/5'}`}
           >
-            🎤
+            {listening ? <MicOff size={20} /> : <Mic size={20} />}
           </button>
-
-          {/* Text input */}
-          <div className="flex-1 relative">
+          <div className="relative flex-1">
             <input
-              value={inputText}
-              onChange={e => setInputText(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder="Type or speak in any language..."
-              className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 pr-12 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 outline-none focus:ring-2 focus:ring-bharat-saffron"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && sendMsg()}
+              placeholder={listening ? '🎤 Listening...' : 'Type or speak in any language...'}
+              className="w-full rounded-2xl border border-orange-100 bg-orange-50/60 px-4 py-2.5 pr-10 text-sm text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-bharat-saffron/30 dark:border-gray-700 dark:bg-white/5 dark:text-gray-200"
             />
           </div>
-
-          {/* Send button */}
           <button
-            onClick={() => sendMessage()}
-            disabled={!inputText.trim()}
-            className="h-12 w-12 flex-shrink-0 rounded-full bg-bharat-saffron text-white flex items-center justify-center text-xl hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={() => sendMsg()}
+            disabled={!input.trim()}
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-bharat-saffron text-white shadow-md transition hover:opacity-90 disabled:opacity-40"
           >
-            ➤
+            <Send size={18} />
+          </button>
+          <button onClick={() => { setMsgs([]); setInput(''); }} className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-gray-400 hover:bg-orange-100 hover:text-gray-600 transition dark:bg-white/5">
+            <RotateCcw size={18} />
           </button>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-2">
-          AI-powered · 22 Indian languages · Works offline for basics
-        </p>
+        <div className="flex items-center justify-center gap-4 pb-3 text-[11px] text-gray-400">
+          <div className="flex items-center gap-1"><HelpCircle size={11} /> 22 languages</div>
+          <div className="flex items-center gap-1"><MessageCircle size={11} /> Voice & text</div>
+          <div className="flex items-center gap-1"><Sparkles size={11} /> Bharat AI</div>
+        </div>
       </div>
     </div>
   );
