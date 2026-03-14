@@ -1,0 +1,32 @@
+{
+  "common": {
+    "login": "உள்நுழை",
+    "signup": "பதிவு",
+    "logout": "வெளியேறு",
+    "sendOtp": "OTP அனுப்பு",
+    "verify": "சரிபார்",
+    "submit": "சமர்ப்பி",
+    "cancel": "ரத்து",
+    "save": "சேமி",
+    "loading": "ஏற்றுகிறது..."
+  },
+  "auth": {
+    "phonePlaceholder": "10 இலக்க மொபைல் எண்ணை உள்ளிடவும்",
+    "otpSent": "OTP அனுப்பப்பட்டது",
+    "enterOtp": "6 இலக்க OTP உள்ளிடவும்",
+    "resendIn": "மீண்டும் அனுப்பு",
+    "resendOtp": "OTP மீண்டும் அனுப்பு",
+    "wrongOtp": "தவறான OTP. மீண்டும் முயற்சிக்கவும்.",
+    "fullName": "முழு பெயர்",
+    "profilePhoto": "சுயவிவர படம்",
+    "languagePreference": "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்",
+    "state": "மாநிலம்",
+    "district": "மாவட்டம்",
+    "step": "படி",
+    "of": "/"
+  },
+  "app": {
+    "tagline": "பாரதத்திற்கான ஒரு பயன்பாடு",
+    "bharatSuperApp": "பாரத் சூப்பர் ஆப்"
+  }
+}

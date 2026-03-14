@@ -1,0 +1,19 @@
+{
+  "common": { "login": "ലോഗിൻ", "signup": "രജിസ്റ്റർ", "logout": "ലോഗൗട്ട്", "sendOtp": "OTP അയയ്ക്കുക", "verify": "സ്ഥിരീകരിക്കുക", "submit": "സമർപ്പിക്കുക", "cancel": "റദ്ദാക്കുക", "save": "സംരക്ഷിക്കുക", "loading": "ലോഡ് ചെയ്യുന്നു..." },
+  "auth": {
+    "phonePlaceholder": "10 അക്ക മൊബൈൽ നമ്പർ നൽകുക",
+    "otpSent": "OTP അയച്ചു",
+    "enterOtp": "6 അക്ക OTP നൽകുക",
+    "resendIn": "വീണ്ടും അയയ്ക്കുക",
+    "resendOtp": "OTP വീണ്ടും അയയ്ക്കുക",
+    "wrongOtp": "തെറ്റായ OTP. വീണ്ടും ശ്രമിക്കുക.",
+    "fullName": "പൂർണ്ണ പേര്",
+    "profilePhoto": "പ്രൊഫൈൽ ഫോട്ടോ",
+    "languagePreference": "നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക",
+    "state": "സംസ്ഥാനം",
+    "district": "ജില്ല",
+    "step": "ഘട്ടം",
+    "of": "/"
+  },
+  "app": { "tagline": "ഭാരതത്തിനുള്ള ഒരു ആപ്പ്", "bharatSuperApp": "ഭാരത് സൂപ്പർ ആപ്പ്" }
+}
