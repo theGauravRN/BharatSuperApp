@@ -1,146 +1,100 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
+import { Briefcase, MapPin, Clock, Building2, ChevronRight, Search, Filter, Star, Users, TrendingUp, CheckCircle2, BookmarkPlus, Zap, Trophy } from 'lucide-react';
 
-const JOB_LISTINGS = [
-  { id: 1, title: 'Delivery Partner', company: 'Zomato', location: 'Jaipur', salary: '₹18,000–₹25,000/mo', type: 'Full-time', category: 'Delivery', posted: '2 hr ago', openings: 12, urgent: true, skills: ['Bike', '2-Wheeler licence'], icon: '🛵' },
-  { id: 2, title: 'Electrician', company: 'L&T Construction', location: 'Jaipur', salary: '₹20,000–₹28,000/mo', type: 'Contract', category: 'Skilled Trade', posted: '1 day ago', openings: 5, urgent: false, skills: ['Wiring', 'ITI Certificate'], icon: '⚡' },
-  { id: 3, title: 'House Cleaning Staff', company: 'Urban Company', location: 'Jaipur', salary: '₹12,000–₹18,000/mo', type: 'Part-time', category: 'Domestic', posted: '3 hr ago', openings: 20, urgent: true, skills: ['Cleaning', 'Flexible hours'], icon: '🧹' },
-  { id: 4, title: 'Auto-Rickshaw Driver', company: 'Namma Yatri', location: 'Jaipur', salary: '₹22,000–₹35,000/mo', type: 'Self-employed', category: 'Transport', posted: '5 hr ago', openings: 50, urgent: false, skills: ['Driving licence', 'Smartphone'], icon: '🛺' },
-  { id: 5, title: 'Construction Labour (Skilled)', company: 'Godrej Properties', location: 'Jaipur', salary: '₹600–₹900/day', type: 'Daily Wage', category: 'Construction', posted: '6 hr ago', openings: 30, urgent: true, skills: ['Masonry', 'Bar bending'], icon: '🏗️' },
-  { id: 6, title: 'Tailor / Stitching Expert', company: 'Manyavar', location: 'Jaipur', salary: '₹15,000–₹22,000/mo', type: 'Full-time', category: 'Skilled Trade', posted: '1 day ago', openings: 8, urgent: false, skills: ['Stitching', 'Pattern cutting'], icon: '🧵' },
+const JOBS = [
+  { id: 1, title: 'Delivery Partner',      company: 'Swiggy',         loc: 'Jaipur',  sal: '₹18K–22K', type: 'Gig',     bg: 'immediate', skills: ['Bike', '2-Wheeler Licence'], img: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=80&q=80', hot: true },
+  { id: 2, title: 'Electrician',           company: 'L&T',            loc: 'Jaipur',  sal: '₹22K–28K', type: 'Full-time','bg': 'fast',      skills: ['ITI Electrical', 'Wiring'], img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=80&q=80', hot: true },
+  { id: 3, title: 'Data Entry Operator',   company: 'SBI',            loc: 'Remote',  sal: '₹15K–20K', type: 'Part-time', bg: 'open',      skills: ['Typing 30+ WPM', 'Computer'], img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=80&q=80', hot: false },
+  { id: 4, title: 'Retail Associate',      company: 'Reliance Retail', loc: 'Jaipur', sal: '₹14K–18K', type: 'Full-time', bg: 'open',      skills: ['Communication', 'Customer service'], img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=80&q=80', hot: false },
+  { id: 5, title: 'House Nurse / Caregiver', company: 'HealthFirst',  loc: 'Jaipur',  sal: '₹16K–24K', type: 'Full-time', bg: 'immediate', skills: ['GNM/ANM Certificate'], img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=80&q=80', hot: true },
+  { id: 6, title: 'AC Technician',         company: 'Urban Company',  loc: 'Jaipur',  sal: '₹20K–35K', type: 'Gig',     bg: 'open',       skills: ['AC Repair', 'ITI'], img: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=80&q=80', hot: false },
 ];
 
-const PROFILE = {
-  name: 'Rahul Verma',
-  skills: ['Driving', 'Basic Electronics', 'Smartphone use'],
-  experience: '2 years',
-  completeness: 72,
-  verifications: ['Aadhaar ✓', 'Phone ✓', 'Skill Test: Pending'],
-  applied: 3,
-  interviews: 1,
-};
-
-const CATEGORIES = ['All', 'Delivery', 'Skilled Trade', 'Domestic', 'Transport', 'Construction', 'Security'];
+const BG_COLORS: Record<string, string> = { immediate: 'bg-red-100 text-red-600', fast: 'bg-yellow-100 text-yellow-600', open: 'bg-green-100 text-green-600' };
+const BG_LABEL: Record<string, string> = { immediate: 'Urgent Hire', fast: 'Fast-Track', open: 'Open' };
 
 export default function JobsPage() {
-  const [activeTab, setActiveTab] = useState<'jobs' | 'applied' | 'profile' | 'earn'>('jobs');
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
+  const [tab, setTab] = useState<'jobs' | 'applied' | 'gig' | 'income'>('jobs');
+  const [search, setSearch] = useState('');
+  const [saved, setSaved] = useState<number[]>([]);
 
-  const applyJob = (id: number) => setAppliedJobs(prev => prev.includes(id) ? prev : [...prev, id]);
-
-  const filtered = JOB_LISTINGS.filter(j => activeCategory === 'All' || j.category === activeCategory);
+  const filtered = JOBS.filter(j => j.title.toLowerCase().includes(search.toLowerCase()) || j.company.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-bharat-navy">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-br from-slate-700 via-gray-800 to-slate-900 px-4 pb-6 pt-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h1 className="text-xl font-bold text-white">💼 Gig & Jobs</h1>
-            <p className="text-xs text-white/70">नौकरी खोजो — काम पाओ</p>
+      <div className="relative overflow-hidden">
+        <Image src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&q=80" alt="jobs" width={1200} height={180} className="h-44 w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-800/90 via-gray-700/60 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-end px-4 pb-4">
+          <h1 className="text-xl font-bold text-white">Gig Economy & Jobs</h1>
+          <p className="text-xs text-white/80">नौकरी जो आपके पास आए — Verified jobs near you</p>
+          <div className="mt-3 flex gap-3">
+            {[['24K+', 'Jobs Nearby'], ['4.8★', 'Avg Rating'], ['72h', 'Avg Hiring']].map(([v, l]) => (
+              <div key={l} className="rounded-xl bg-white/15 px-3 py-2 text-center backdrop-blur">
+                <p className="font-black text-white text-sm">{v}</p>
+                <p className="text-[10px] text-white/70">{l}</p>
+              </div>
+            ))}
           </div>
-          <div className="text-right text-white/80 text-xs">
-            <p>📍 Jaipur</p>
-            <p>24 new jobs today</p>
-          </div>
-        </div>
-        {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-3">
-          {[['📤 Applied', '3 jobs'], ['📅 Interviews', '1 upcoming'], ['💰 Avg Salary', '₹22K/mo']].map(([k, v]) => (
-            <div key={k} className="bg-white/15 rounded-xl p-3 text-center border border-white/20">
-              <p className="text-white font-bold text-sm">{v}</p>
-              <p className="text-white/70 text-xs">{k}</p>
-            </div>
-          ))}
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-4">
-        {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4">
-          {(['jobs', 'applied', 'profile', 'earn'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tab ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow' : 'text-gray-500'}`}
-            >
-              {tab === 'jobs' ? '🔍 Find Jobs' : tab === 'applied' ? '📤 Applied' : tab === 'profile' ? '👤 Profile' : '💰 Income'}
-            </button>
+      <div className="mx-auto max-w-3xl px-4 py-4">
+        <div className="mb-4 flex gap-1 rounded-xl bg-orange-50/80 p-1 dark:bg-white/5">
+          {([['jobs','Jobs'],['applied','Applied'],['gig','Gig Work'],['income','Income']] as const).map(([t, l]) => (
+            <button key={t} onClick={() => setTab(t)} className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${tab === t ? 'bg-white text-gray-900 shadow dark:bg-gray-700 dark:text-white' : 'text-gray-500'}`}>{l}</button>
           ))}
         </div>
 
-        {activeTab === 'jobs' && (
+        {tab === 'jobs' && (
           <>
-            {/* Search */}
-            <div className="relative mb-3">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-              <input
-                placeholder="Search jobs... नौकरी खोजें"
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-9 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-bharat-saffron"
-              />
+            <div className="mb-3 flex gap-2">
+              <div className="relative flex-1">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Job title, company, skills..." className="w-full rounded-xl border border-orange-100 bg-white/80 pl-9 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-bharat-saffron/30 dark:border-gray-700 dark:bg-white/5" />
+              </div>
+              <button className="flex items-center gap-1.5 rounded-xl border border-orange-100 bg-white/80 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-orange-50 dark:border-gray-700 dark:bg-white/5 transition">
+                <Filter size={15} /> Filter
+              </button>
             </div>
-
-            {/* Category filter */}
-            <div className="flex gap-2 overflow-x-auto scrollbar-none pb-0.5 mb-3">
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition ${activeCategory === cat ? 'bg-bharat-saffron text-white' : 'bg-white dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700'}`}
-                >
-                  {cat}
-                </button>
+            <div className="mb-3 flex gap-2 overflow-x-auto pb-0.5">
+              {['All','Gig','Full-time','Part-time','Work-from-Home'].map(f => (
+                <button key={f} className={`flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${f === 'All' ? 'bg-bharat-saffron text-white' : 'bg-white/80 text-gray-500 ring-1 ring-orange-100/60 hover:bg-orange-50 dark:bg-white/5 dark:ring-white/10'}`}>{f}</button>
               ))}
             </div>
-
-            {/* AI job match */}
-            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/10 rounded-2xl p-4 border border-indigo-200 dark:border-indigo-800 mb-4 flex items-center gap-3">
-              <span className="text-3xl">🤖</span>
-              <div className="flex-1">
-                <p className="font-bold text-gray-900 dark:text-white text-sm">AI matched 3 jobs for you!</p>
-                <p className="text-xs text-gray-500">Based on your skills: Driving, Electronics</p>
-              </div>
-              <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold">View →</button>
-            </div>
-
             <div className="space-y-3">
               {filtered.map(job => (
-                <div key={job.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
+                <div key={job.id} className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
                   <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl">{job.icon}</div>
+                    <Image src={job.img} alt={job.company} width={56} height={56} className="h-14 w-14 rounded-2xl object-cover" />
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-bold text-gray-900 dark:text-white text-sm">{job.title}</p>
-                            {job.urgent && <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-bold">URGENT</span>}
-                          </div>
-                          <p className="text-xs text-gray-500 mt-0.5">{job.company} · 📍 {job.location}</p>
+                          <p className="font-bold text-gray-900 dark:text-white">{job.title}</p>
+                          <p className="flex items-center gap-1 text-sm text-gray-500 mt-0.5"><Building2 size={12} /> {job.company}</p>
                         </div>
+                        {job.hot && <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-600">🔥 Hot</span>}
                       </div>
-                      <p className="text-sm font-semibold text-bharat-saffron mt-1">{job.salary}</p>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full">{job.type}</span>
-                        {job.skills.map(s => (
-                          <span key={s} className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-2 py-0.5 rounded-full">{s}</span>
-                        ))}
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                        <span className="flex items-center gap-1"><MapPin size={10} /> {job.loc}</span>
+                        <span className="flex items-center gap-1"><Clock size={10} /> {job.type}</span>
+                        <span className="font-bold text-bharat-saffron">{job.sal}/month</span>
                       </div>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                        <span>🕒 {job.posted}</span>
-                        <span>·</span>
-                        <span>👥 {job.openings} openings</span>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {job.skills.map(s => <span key={s} className="rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:bg-white/5 dark:text-gray-400">{s}</span>)}
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${BG_COLORS[job.bg]}`}>{BG_LABEL[job.bg]}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2 mt-3">
-                    <button className="flex-1 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">View Details</button>
-                    <button
-                      onClick={() => applyJob(job.id)}
-                      className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${appliedJobs.includes(job.id) ? 'bg-green-100 text-green-600 dark:bg-green-900/30' : 'bg-bharat-saffron text-white hover:opacity-90'}`}
-                    >
-                      {appliedJobs.includes(job.id) ? '✓ Applied' : 'Apply Now'}
+                  <div className="mt-3 flex gap-2">
+                    <button onClick={() => setSaved(p => p.includes(job.id) ? p.filter(i => i !== job.id) : [...p, job.id])} className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-orange-100 hover:bg-orange-50 dark:border-gray-700 transition">
+                      <BookmarkPlus size={17} className={saved.includes(job.id) ? 'fill-bharat-saffron text-bharat-saffron' : 'text-gray-400'} />
                     </button>
+                    <button className="flex-1 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-gray-700 hover:bg-orange-50 dark:border-gray-600 dark:text-gray-300 transition">Details</button>
+                    <button className="flex-1 rounded-xl bg-bharat-saffron py-2.5 text-sm font-bold text-white hover:opacity-90 transition">Apply Now</button>
                   </div>
                 </div>
               ))}
@@ -148,120 +102,100 @@ export default function JobsPage() {
           </>
         )}
 
-        {activeTab === 'applied' && (
+        {tab === 'applied' && (
           <div className="space-y-3">
-            {appliedJobs.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-6xl mb-3">📋</p>
-                <p className="text-gray-500 font-medium">No applications yet</p>
-                <button onClick={() => setActiveTab('jobs')} className="mt-4 px-6 py-2.5 bg-bharat-saffron text-white rounded-xl font-semibold text-sm">Find Jobs</button>
-              </div>
-            ) : (
-              JOB_LISTINGS.filter(j => appliedJobs.includes(j.id)).map(job => (
-                <div key={job.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl">{job.icon}</div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 dark:text-white">{job.title}</p>
-                      <p className="text-xs text-gray-500">{job.company} · {job.location}</p>
-                    </div>
-                    <span className="text-xs bg-blue-100 text-blue-600 dark:bg-blue-900/30 px-2 py-0.5 rounded-full font-medium">Under Review</span>
+            {[
+              { title: 'Electrician', company: 'L&T',   status: 'Under Review', date: 'Mar 12', step: 1, img: JOBS[1].img },
+              { title: 'Delivery Partner', company: 'Swiggy', status: 'Interview Scheduled', date: 'Mar 14', step: 2, img: JOBS[0].img },
+              { title: 'AC Technician', company: 'Urban Co', status: 'Selected', date: 'Mar 10', step: 3, img: JOBS[5].img },
+            ].map((app, i) => (
+              <div key={i} className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+                <div className="flex items-center gap-3">
+                  <Image src={app.img} alt={app.company} width={48} height={48} className="h-12 w-12 rounded-xl object-cover" />
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900 dark:text-white">{app.title}</p>
+                    <p className="text-xs text-gray-500">{app.company} · Applied {app.date}</p>
                   </div>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${app.step === 3 ? 'bg-green-100 text-green-600' : app.step === 2 ? 'bg-blue-100 text-blue-600' : 'bg-yellow-100 text-yellow-600'}`}>
+                    {app.step === 3 ? <CheckCircle2 size={11} className="mr-0.5 inline" /> : null}{app.status}
+                  </span>
                 </div>
-              ))
-            )}
+                <div className="mt-3 flex gap-0.5">
+                  {['Applied', 'Reviewed', 'Interview', 'Offer'].map((s, si) => (
+                    <div key={s} className={`flex-1 ${si > 0 ? 'ml-0.5' : ''}`}>
+                      <div className={`h-1.5 rounded-full ${si < app.step ? 'bg-bharat-saffron' : 'bg-gray-200 dark:bg-gray-700'}`} />
+                      <p className="mt-1 text-center text-[9px] text-gray-400 hidden sm:block">{s}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {activeTab === 'profile' && (
+        {tab === 'gig' && (
           <div className="space-y-4">
-            {/* Profile completeness */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-slate-500 to-gray-600 flex items-center justify-center text-white text-2xl font-bold">R</div>
-                <div className="flex-1">
-                  <p className="font-bold text-gray-900 dark:text-white">{PROFILE.name}</p>
-                  <p className="text-xs text-gray-500">Profile {PROFILE.completeness}% complete</p>
-                </div>
-              </div>
-              <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full mb-3">
-                <div className="h-2 rounded-full bg-gradient-to-r from-bharat-saffron to-bharat-orange" style={{ width: `${PROFILE.completeness}%` }} />
-              </div>
-              <p className="text-xs text-gray-500 mb-3">Complete your profile to get 3x more job matches</p>
-
-              <div className="space-y-2">
-                {PROFILE.verifications.map(v => (
-                  <div key={v} className="flex items-center gap-2 text-sm">
-                    <span className={v.includes('✓') ? 'text-green-500' : 'text-yellow-500'}>{v.includes('✓') ? '✓' : '⏳'}</span>
-                    <span className="text-gray-600 dark:text-gray-400">{v}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-gray-900 dark:text-white">Skills</h3>
-                <button className="text-xs text-bharat-saffron">+ Add Skill</button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {PROFILE.skills.map(s => (
-                  <span key={s} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 text-xs font-medium rounded-full">{s}</span>
-                ))}
-              </div>
-            </div>
-
-            {/* Skill Test */}
-            <div className="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/10 rounded-2xl p-4 border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">🏆</span>
+            <div className="rounded-2xl bg-gradient-to-r from-bharat-saffron to-bharat-orange p-4 text-white shadow-md">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-gray-900 dark:text-white">Skill Verification</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Get verified badge — earn 40% more jobs</p>
+                  <p className="font-bold text-lg">Today's Earnings</p>
+                  <p className="text-3xl font-black mt-0.5">₹840</p>
                 </div>
-                <button className="ml-auto px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-semibold">Take Test</button>
+                <div className="text-right">
+                  <p className="text-sm opacity-80">5 gigs completed</p>
+                  <p className="text-sm opacity-80 mt-0.5">4.9★ rating today</p>
+                </div>
               </div>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Today's Gigs</p>
+              {[
+                { task: 'Package Delivery — Zone A', dur: '2.5 hrs', earned: '₹320', status: 'Completed' },
+                { task: 'Grocery Delivery — Zone B', dur: '1 hr',   earned: '₹180', status: 'Completed' },
+                { task: 'New delivery request nearby', dur: 'Est. 45 min', earned: '~₹150', status: 'Accept' },
+              ].map((gig, i) => (
+                <div key={i} className={`flex items-center gap-3 py-3 ${i < 2 ? 'border-b border-orange-50/80 dark:border-white/5' : ''}`}>
+                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${gig.status === 'Completed' ? 'bg-green-100 dark:bg-green-900/20' : 'bg-blue-100 dark:bg-blue-900/20'}`}>
+                    <Zap size={16} className={gig.status === 'Completed' ? 'text-green-500' : 'text-blue-500'} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-800 dark:text-white">{gig.task}</p>
+                    <p className="text-xs text-gray-400">{gig.dur}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-sm text-gray-900 dark:text-white">{gig.earned}</p>
+                    <span className={`text-xs font-semibold ${gig.status === 'Completed' ? 'text-green-500' : 'text-blue-500'}`}>
+                      {gig.status === 'Accept' ? <button className="rounded-lg bg-blue-500 px-2 py-0.5 text-xs font-bold text-white">Accept</button> : gig.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {activeTab === 'earn' && (
+        {tab === 'income' && (
           <div className="space-y-4">
-            {/* Income summary */}
-            <div className="bg-gradient-to-br from-slate-700 to-gray-800 rounded-2xl p-5 text-white">
-              <p className="text-sm opacity-70">This Month Earnings</p>
-              <p className="text-4xl font-bold mt-1">₹24,500</p>
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                {[['Days Worked', '22'], ['Avg/Day', '₹1,114'], ['Rating', '4.8 ⭐']].map(([k, v]) => (
-                  <div key={k} className="bg-white/15 rounded-xl p-2.5 text-center">
-                    <p className="opacity-70 text-xs">{k}</p>
-                    <p className="font-bold">{v}</p>
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Income This Week</p>
+              <div className="flex items-end justify-between gap-1 h-24">
+                {[['Mon','₹420',70],['Tue','₹680',87],['Wed','₹320',52],['Thu','₹890',100],['Fri','₹600',78],['Sat','₹750',88],['Sun','—',0]].map(([d, v, h]) => (
+                  <div key={d} className="flex flex-1 flex-col items-center gap-1">
+                    <div className="w-full rounded-t-lg bg-gradient-to-t from-bharat-saffron to-bharat-orange" style={{ height: `${Number(h) * 0.88}%`, minHeight: Number(h) > 0 ? 4 : 0 }} />
+                    <p className="text-[9px] text-gray-400">{d}</p>
                   </div>
                 ))}
               </div>
+              <p className="mt-3 text-center text-lg font-black text-gray-900 dark:text-white">₹3,660 this week</p>
             </div>
-
-            {/* Salary advance */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
-              <h3 className="font-bold text-gray-900 dark:text-white mb-3">💸 Income Smoothing</h3>
-              <div className="space-y-3">
-                {[
-                  { title: 'Salary Advance', desc: 'Get ₹5,000 advance on earned salary', icon: '📤', color: 'bg-blue-50 text-blue-600' },
-                  { title: 'Emergency Loan', desc: 'Instant ₹10,000 — repay in 3 months', icon: '🆘', color: 'bg-red-50 text-red-600' },
-                  { title: 'ESI Benefits', desc: 'Health insurance for gig workers', icon: '❤️', color: 'bg-green-50 text-green-600' },
-                  { title: 'PF Registration', desc: 'Provident fund for gig economy', icon: '🏦', color: 'bg-purple-50 text-purple-600' },
-                ].map(item => (
-                  <div key={item.title} className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-xl ${item.color}`}>{item.icon}</div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800 dark:text-white">{item.title}</p>
-                      <p className="text-xs text-gray-500">{item.desc}</p>
-                    </div>
-                    <button className="px-3 py-1.5 bg-bharat-saffron text-white rounded-lg text-xs font-semibold">Access</button>
-                  </div>
-                ))}
+            <div className="rounded-2xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-800 dark:bg-violet-900/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Trophy size={20} className="text-violet-500" />
+                <p className="font-bold text-gray-900 dark:text-white">Income Smoothing (Advance)</p>
               </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Get advance against your earned gig income — instant, no interest for 7 days</p>
+              <p className="text-lg font-black text-violet-600 dark:text-violet-300 mt-2">₹2,000 available now</p>
+              <button className="mt-3 w-full rounded-xl bg-violet-600 py-3 text-sm font-bold text-white hover:bg-violet-700 transition">Get Advance — 0% for 7 days</button>
             </div>
           </div>
         )}

@@ -1,233 +1,200 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
+import { Landmark, FileText, AlertCircle, IndianRupee, FolderOpen, ShieldCheck, CheckCircle2, Clock, ChevronRight, Download, Upload } from 'lucide-react';
 
-const DOCUMENTS = [
-  { name: 'Aadhaar Card', number: 'XXXX XXXX 4521', status: 'Verified', icon: '🆔', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  { name: 'PAN Card', number: 'ABCDE1234F', status: 'Verified', icon: '📄', color: 'text-orange-600', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-  { name: 'Driving Licence', number: 'RJ14 2022 0043211', status: 'Valid', icon: '🚗', color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20' },
-  { name: 'Voter ID', number: 'RZJ0234521', status: 'Verified', icon: '🗳️', color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-  { name: 'Class 10 Certificate', number: 'RBSE/2018/456789', status: 'Uploaded', icon: '🎓', color: 'text-teal-600', bg: 'bg-teal-50 dark:bg-teal-900/20' },
-  { name: 'Land Record (Khasra)', number: 'Khasra No. 234/B', status: 'Uploaded', icon: '🌾', color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-];
-
-const SERVICES = [
-  { name: 'DigiLocker', desc: 'Access all your documents', icon: '📁', color: 'from-blue-400 to-indigo-500' },
-  { name: 'Land Records', desc: 'Bhulekh, mutation, registry', icon: '🌍', color: 'from-green-400 to-teal-500' },
-  { name: 'Grievance Portal', desc: 'Submit & track complaints', icon: '📢', color: 'from-red-400 to-rose-500' },
-  { name: 'Scheme Finder', desc: 'Check eligibility & apply', icon: '🎯', color: 'from-purple-400 to-violet-500' },
-  { name: 'RTI Filing', desc: 'Right to Information', icon: '📜', color: 'from-orange-400 to-amber-500' },
-  { name: 'Voter Services', desc: 'Registration, EPIC, info', icon: '🗳️', color: 'from-teal-400 to-cyan-500' },
-  { name: 'Birth/Death Cert', desc: 'Apply for civic documents', icon: '📋', color: 'from-pink-400 to-rose-500' },
-  { name: 'Income Certificate', desc: 'Revenue department', icon: '💼', color: 'from-indigo-400 to-blue-500' },
-];
-
-const GRIEVANCES = [
-  { id: 'GR2024-0234', title: 'Road repair pending at Ward 12', dept: 'Municipal Corporation', date: 'Mar 10, 2026', status: 'In Progress', days: 4 },
-  { id: 'GR2024-0198', title: 'Street light not working for 2 weeks', dept: 'JVVNL', date: 'Feb 28, 2026', status: 'Resolved', days: 14 },
+const DIGILOCKER_DOCS = [
+  { name: 'Aadhaar Card',        issuer: 'UIDAI',            date: 'Linked', status: 'verified', img: 'https://images.unsplash.com/photo-1586185745057-8fc1e21d3f6f?w=60&q=80' },
+  { name: 'PAN Card',            issuer: 'Income Tax Dept',  date: 'Linked', status: 'verified', img: 'https://images.unsplash.com/photo-1559526324-593bc073d938?w=60&q=80' },
+  { name: 'Voter ID (EPIC)',     issuer: 'Election Commission', date: 'Linked', status: 'verified', img: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=60&q=80' },
+  { name: 'Driving Licence',    issuer: 'Rajasthan RTO',    date: 'Feb 2028', status: 'verified', img: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=60&q=80' },
+  { name: 'Class 12 Certificate', issuer: 'RBSE',            date: 'May 2018', status: 'pending', img: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=60&q=80' },
 ];
 
 const SCHEMES = [
-  { name: 'PM Awas Yojana (Urban)', benefit: '₹2.5 Lakh housing subsidy', eligible: true, applied: true, icon: '🏠' },
-  { name: 'Ayushman Bharat (PM-JAY)', benefit: '₹5 Lakh health cover', eligible: true, applied: true, icon: '❤️' },
-  { name: 'PM SVANidhi', benefit: '₹50,000 micro-loan for vendors', eligible: false, applied: false, icon: '💰' },
-  { name: 'PM Vishwakarma', benefit: 'Skill training + ₹15K toolkit', eligible: true, applied: false, icon: '🔨' },
-  { name: 'NSP — National Scholarship', benefit: 'Up to ₹10,000 education', eligible: true, applied: false, icon: '🎓' },
+  { name: 'PM-KISAN Samman Nidhi', dept: 'Agriculture Ministry', benefit: '₹6,000/year', status: 'Enrolled', category: 'Farmer', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=80&q=80' },
+  { name: 'Ayushman Bharat PMJAY', dept: 'Health Ministry', benefit: '₹5 Lakh health cover', status: 'Eligible', category: 'Health', img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=80&q=80' },
+  { name: 'PMEGP — Self Employment', dept: 'MSME Ministry', benefit: '35% subsidy', status: 'Apply Now', category: 'Business', img: 'https://images.unsplash.com/photo-1560472355-a3b1ece1c46f?w=80&q=80' },
+  { name: 'Mukhyamantri Laghu Udyog', dept: 'Rajasthan Govt', benefit: '25% subsidy on equipment', status: 'Apply Now', category: 'Business', img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=80&q=80' },
+];
+
+const GRIEVANCES = [
+  { id: '#GRV-2843', dept: 'BSNL',         issue: 'Broadband outage since 3 days', date: 'Mar 10', status: 'In Progress', days: 4 },
+  { id: '#GRV-2791', dept: 'JVVNL (Power)', issue: 'Street light not working since Jan', date: 'Mar 2', status: 'Resolved', days: 10 },
 ];
 
 export default function GovTechPage() {
-  const [activeTab, setActiveTab] = useState<'services' | 'documents' | 'grievances' | 'schemes'>('services');
-  const [grievanceText, setGrievanceText] = useState('');
+  const [tab, setTab] = useState<'home' | 'digilocker' | 'schemes' | 'grievance'>('home');
+  const [newGrievance, setNewGrievance] = useState('');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-bharat-navy">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-800 via-indigo-800 to-blue-900 px-4 pb-6 pt-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h1 className="text-xl font-bold text-white">🏛️ GovTech</h1>
-            <p className="text-xs text-white/70">सरकारी सेवाएं — एक जगह</p>
-          </div>
-          <div className="text-right">
-            <p className="text-white/70 text-xs">Linked: Aadhaar ✓</p>
-            <p className="text-white/70 text-xs">DigiLocker ✓</p>
-          </div>
-        </div>
-
-        {/* Identity card */}
-        <div className="bg-white/15 rounded-2xl p-4 border border-white/20">
-          <div className="flex items-center gap-3">
-            <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl">👤</div>
-            <div>
-              <p className="text-white font-bold text-lg">Rahul Verma</p>
-              <p className="text-white/70 text-xs">Aadhaar: XXXX XXXX 4521</p>
-              <p className="text-white/70 text-xs">Jaipur, Rajasthan · PIN: 302001</p>
-            </div>
-            <div className="ml-auto text-right">
-              <span className="bg-green-400/30 text-green-100 text-xs px-2 py-1 rounded-full font-medium">✓ eKYC Done</span>
-            </div>
+      <div className="relative overflow-hidden">
+        <Image src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80" alt="india" width={1200} height={180} className="h-44 w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-indigo-700/60 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-end px-4 pb-4">
+          <h1 className="text-xl font-bold text-white">GovTech</h1>
+          <p className="text-xs text-white/80">सरकारी सेवाएं — एक क्लिक में</p>
+          <div className="mt-3 flex items-center gap-2">
+            <ShieldCheck size={14} className="text-green-400" />
+            <p className="text-xs text-white/90">Connected to DigiLocker · Aadhaar Verified</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-4">
-        {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4">
-          {(['services', 'documents', 'grievances', 'schemes'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tab ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow' : 'text-gray-500'}`}
-            >
-              {tab === 'services' ? '🏛️ Services' : tab === 'documents' ? '📁 Docs' : tab === 'grievances' ? '📢 Griev.' : '🎯 Schemes'}
-            </button>
+      <div className="mx-auto max-w-3xl px-4 py-4">
+        <div className="mb-4 flex gap-1 rounded-xl bg-orange-50/80 p-1 dark:bg-white/5">
+          {([['home','Home'],['digilocker','DigiLocker'],['schemes','Schemes'],['grievance','Grievance']] as const).map(([t, l]) => (
+            <button key={t} onClick={() => setTab(t)} className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${tab === t ? 'bg-white text-gray-900 shadow dark:bg-gray-700 dark:text-white' : 'text-gray-500'}`}>{l}</button>
           ))}
         </div>
 
-        {activeTab === 'services' && (
-          <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {SERVICES.map(service => (
-                <button key={service.name} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 text-left hover:shadow-md transition group">
-                  <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${service.color} flex items-center justify-center text-2xl mb-2`}>
-                    {service.icon}
-                  </div>
-                  <p className="text-sm font-semibold text-gray-800 dark:text-white">{service.name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{service.desc}</p>
+        {tab === 'home' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { Icon: FolderOpen,  title: 'DigiLocker',     desc: '5 docs linked',       color: 'border-blue-200 bg-blue-50/80',   onClick: () => setTab('digilocker') },
+                { Icon: IndianRupee, title: 'My Schemes',     desc: '4 matching schemes',  color: 'border-green-200 bg-green-50/80', onClick: () => setTab('schemes') },
+                { Icon: AlertCircle, title: 'File Grievance', desc: 'Register complaint',  color: 'border-orange-200 bg-orange-50/80', onClick: () => setTab('grievance') },
+                { Icon: FileText,    title: 'RTI Filing',     desc: 'Right to Information', color: 'border-violet-200 bg-violet-50/80', onClick: () => {} },
+              ].map(item => (
+                <button key={item.title} onClick={item.onClick} className={`rounded-2xl border p-4 text-left transition hover:shadow-md dark:bg-white/5 dark:border-gray-700 ${item.color}`}>
+                  <item.Icon size={28} strokeWidth={1.5} className="text-gray-700 dark:text-gray-300 mb-2" />
+                  <p className="font-bold text-sm text-gray-900 dark:text-white">{item.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
                 </button>
               ))}
             </div>
 
-            {/* Recent service */}
-            <div className="mt-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">✅</span>
-                <div>
-                  <p className="font-bold text-gray-900 dark:text-white">Caste Certificate — Applied</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Application No: CAS/2026/3421</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Expected by: Mar 20, 2026 · Submitted: Mar 14</p>
-                </div>
-                <button className="ml-auto text-xs text-bharat-saffron font-medium">Track →</button>
+            {/* Govt portals */}
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Govt Portals (Quick Access)</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { name: 'Income Tax', icon: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=40&q=80' },
+                  { name: 'EPFO',       icon: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=40&q=80' },
+                  { name: 'BHIM UPI',   icon: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=40&q=80' },
+                  { name: 'e-Courts',   icon: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=40&q=80' },
+                  { name: 'RERA',       icon: 'https://images.unsplash.com/photo-1560472355-a3b1ece1c46f?w=40&q=80' },
+                  { name: 'RTO Parivahan', icon: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=40&q=80' },
+                ].map(p => (
+                  <button key={p.name} className="flex flex-col items-center gap-2 rounded-xl bg-orange-50/60 py-3 px-2 hover:bg-orange-100/80 transition dark:bg-white/5">
+                    <Image src={p.icon} alt={p.name} width={32} height={32} className="h-8 w-8 rounded-lg object-cover" />
+                    <span className="text-[10px] font-semibold text-gray-600 dark:text-gray-400 text-center">{p.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
-          </>
+
+            {/* Ration card */}
+            <div className="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50/80 p-4 dark:border-green-800 dark:bg-green-900/20">
+              <div className="h-12 w-12 flex-shrink-0 rounded-xl bg-green-100 flex items-center justify-center dark:bg-green-900/30">
+                <ShieldCheck size={24} className="text-green-600" strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 dark:text-white">Ration Card Linked</p>
+                <p className="text-sm text-gray-500">AAY Category · 5 members · 35 kg/month</p>
+              </div>
+              <button className="ml-auto flex-shrink-0 rounded-xl bg-green-600 px-3 py-2 text-xs font-bold text-white">View</button>
+            </div>
+          </div>
         )}
 
-        {activeTab === 'documents' && (
-          <>
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 mb-3 flex items-center gap-2">
-              <span className="text-blue-500">🔒</span>
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">All documents secured via DigiLocker — Government verified</p>
+        {tab === 'digilocker' && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 rounded-xl bg-blue-50 px-4 py-3 dark:bg-blue-900/20">
+              <ShieldCheck size={20} className="text-blue-500 flex-shrink-0" />
+              <div>
+                <p className="font-bold text-blue-700 dark:text-blue-300 text-sm">DigiLocker — Aadhaar Verified</p>
+                <p className="text-xs text-blue-500">rahul.verma@digilocker.gov.in</p>
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {DOCUMENTS.map(doc => (
-                <div key={doc.name} className={`rounded-2xl p-4 border ${doc.bg} flex items-center gap-3`}>
-                  <div className="h-12 w-12 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-2xl shadow-sm">{doc.icon}</div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{doc.name}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{doc.number}</p>
-                    <span className={`text-xs font-semibold ${doc.color}`}>✓ {doc.status}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <button className="text-xs text-bharat-saffron font-medium hover:underline">View</button>
-                    <button className="text-xs text-gray-400 hover:text-gray-600">Share</button>
-                  </div>
+            {DIGILOCKER_DOCS.map((doc, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+                <Image src={doc.img} alt={doc.name} width={48} height={48} className="h-12 w-12 rounded-xl object-cover" />
+                <div className="flex-1">
+                  <p className="font-semibold text-sm text-gray-900 dark:text-white">{doc.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{doc.issuer} · {doc.date}</p>
                 </div>
-              ))}
-            </div>
-            <button className="mt-4 w-full py-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-500 text-sm font-medium hover:border-bharat-saffron hover:text-bharat-saffron transition">
-              + Upload New Document
+                {doc.status === 'verified' ? (
+                  <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" fill="#22c55e" />
+                ) : (
+                  <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-bold text-yellow-600">Pending</span>
+                )}
+                <button className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition dark:bg-blue-900/30">
+                  <Download size={14} />
+                </button>
+              </div>
+            ))}
+            <button className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-blue-300 py-4 text-sm font-semibold text-blue-500 hover:bg-blue-50 transition dark:border-blue-700 dark:hover:bg-blue-900/20">
+              <Upload size={18} /> Upload Document
             </button>
-          </>
+          </div>
         )}
 
-        {activeTab === 'grievances' && (
-          <div className="space-y-4">
-            {/* File new */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
-              <h3 className="font-bold text-gray-900 dark:text-white mb-3">📢 File New Grievance</h3>
-              <textarea
-                value={grievanceText}
-                onChange={e => setGrievanceText(e.target.value)}
-                placeholder="Describe your complaint... or use voice 🎤"
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 p-3 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 outline-none focus:ring-2 focus:ring-bharat-saffron resize-none"
-                rows={3}
-              />
-              <div className="flex gap-2 mt-2">
-                <select className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 outline-none">
-                  <option>Select Department</option>
-                  <option>Municipal Corporation</option>
-                  <option>Police</option>
-                  <option>Electricity Board</option>
-                  <option>Water Supply</option>
-                </select>
-                <button className="px-4 py-2 bg-bharat-saffron text-white rounded-xl text-sm font-semibold hover:opacity-90 transition">Submit</button>
-              </div>
+        {tab === 'schemes' && (
+          <div className="space-y-3">
+            <div className="rounded-xl bg-green-50 px-4 py-3 dark:bg-green-900/20">
+              <p className="font-bold text-green-700 dark:text-green-400 text-sm">🎯 4 government schemes match your profile</p>
+              <p className="text-xs text-green-600 mt-0.5">Based on Aadhaar, PAN, location & BPL status</p>
             </div>
-
-            {/* Past grievances */}
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">My Grievances</h3>
-            {GRIEVANCES.map(g => (
-              <div key={g.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{g.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{g.dept} · {g.date}</p>
+            {SCHEMES.map((s, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+                <Image src={s.img} alt={s.name} width={56} height={56} className="h-14 w-14 rounded-xl object-cover" />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="font-bold text-sm text-gray-900 dark:text-white">{s.name}</p>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${s.status === 'Enrolled' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-bharat-saffron'}`}>{s.status}</span>
                   </div>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${g.status === 'Resolved' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                    {g.status}
-                  </span>
+                  <p className="text-xs text-gray-400 mt-0.5">{s.dept}</p>
+                  <p className="text-sm font-semibold text-bharat-saffron mt-0.5">{s.benefit}</p>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-gray-400">
-                  <span>🔢 {g.id}</span>
-                  <span>·</span>
-                  <span>⏱️ {g.days} days</span>
-                  {g.status === 'In Progress' && <span className="text-bharat-saffron font-medium ml-auto">View Status →</span>}
-                </div>
+                <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
               </div>
             ))}
           </div>
         )}
 
-        {activeTab === 'schemes' && (
-          <div className="space-y-3">
-            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl px-4 py-3 mb-1">
-              <p className="font-bold text-purple-700 dark:text-purple-300">🎯 5 schemes match your profile</p>
-              <p className="text-xs text-purple-500">Based on Aadhaar-linked data: income, age, location, occupation</p>
+        {tab === 'grievance' && (
+          <div className="space-y-4">
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+              <p className="mb-3 text-sm font-bold text-gray-900 dark:text-white">File New Grievance</p>
+              <select className="mb-3 w-full rounded-xl border border-orange-100 bg-orange-50/50 px-3 py-2.5 text-sm text-gray-700 outline-none dark:border-gray-700 dark:bg-white/5 dark:text-gray-200">
+                <option>Select Department</option>
+                <option>BSNL / Telecom</option>
+                <option>JVVNL / Electricity</option>
+                <option>Municipal Corporation</option>
+                <option>Water / Jal Jeevan</option>
+                <option>Police</option>
+              </select>
+              <textarea
+                value={newGrievance}
+                onChange={e => setNewGrievance(e.target.value)}
+                placeholder="Describe your issue in detail... (Hindi or English)"
+                rows={4}
+                className="mb-3 w-full rounded-xl border border-orange-100 bg-orange-50/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-bharat-saffron/30 dark:border-gray-700 dark:bg-white/5"
+              />
+              <button className="w-full rounded-xl bg-bharat-saffron py-3 text-sm font-bold text-white hover:opacity-90 transition">Submit Grievance</button>
             </div>
-            {SCHEMES.map(scheme => (
-              <div key={scheme.name} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 flex items-start gap-3">
-                <div className="h-12 w-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-2xl">{scheme.icon}</div>
-                <div className="flex-1">
+
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-orange-100/40 dark:bg-white/5 dark:ring-white/10">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">My Grievances</p>
+              {GRIEVANCES.map((g, i) => (
+                <div key={g.id} className={`py-3 ${i < GRIEVANCES.length - 1 ? 'border-b border-orange-50/80 dark:border-white/5' : ''}`}>
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white text-sm">{scheme.name}</p>
-                      <p className="text-xs text-bharat-saffron font-semibold mt-0.5">{scheme.benefit}</p>
+                      <p className="text-xs font-mono font-bold text-gray-400">{g.id}</p>
+                      <p className="font-semibold text-sm text-gray-900 dark:text-white">{g.issue}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{g.dept} · Filed {g.date}</p>
                     </div>
-                    {scheme.eligible ? (
-                      scheme.applied ? (
-                        <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium flex-shrink-0">✓ Applied</span>
-                      ) : (
-                        <button className="flex-shrink-0 px-3 py-1.5 bg-bharat-saffron text-white rounded-lg text-xs font-semibold hover:opacity-90 transition">Apply</button>
-                      )
-                    ) : (
-                      <span className="text-xs bg-gray-100 text-gray-400 dark:bg-gray-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">Not Eligible</span>
-                    )}
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${g.status === 'Resolved' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
+                      {g.status === 'Resolved' ? <CheckCircle2 size={10} className="mr-0.5 inline" /> : <Clock size={10} className="mr-0.5 inline" />}{g.status}
+                    </span>
                   </div>
+                  <p className="mt-1.5 text-xs text-gray-400">Response time: {g.days} days</p>
                 </div>
-              </div>
-            ))}
-
-            {/* RTI quick file */}
-            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 border border-orange-200 dark:border-orange-800">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl">📜</span>
-                <div>
-                  <p className="font-bold text-gray-900 dark:text-white">File RTI Online</p>
-                  <p className="text-xs text-gray-500">Right to Information Act 2005 — No lawyer needed</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">Fee: ₹10 (SC/ST/BPL: Free) · Response in 30 days</p>
-              <button className="w-full py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition">File RTI Now</button>
+              ))}
             </div>
           </div>
         )}

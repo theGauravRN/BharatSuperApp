@@ -1,112 +1,70 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import {
+  Users, Phone, Newspaper, Wallet, Sprout, ShoppingCart, BookOpen,
+  Heart, Video, Briefcase, Landmark, Zap, Mic, CreditCard, Bell,
+  Package, Activity, ArrowRight, TrendingUp, Send, Play,
+} from 'lucide-react';
 
 const MODULES = [
-  {
-    id: 'social',    icon: '👥', name: 'Social & Connect',    nameHi: 'सोशल और कनेक्ट',
-    stat: '12 new posts', color: 'from-violet-500 to-purple-600', href: '/hi/social',
-    desc: 'Feed, stories, groups & DMs',
-  },
-  {
-    id: 'calling',   icon: '📞', name: 'Audio & Video Call',  nameHi: 'ऑडियो/वीडियो कॉल',
-    stat: '3 missed calls', color: 'from-blue-500 to-cyan-500', href: '/hi/calling',
-    desc: 'Free calls, works on 2G',
-  },
-  {
-    id: 'news',      icon: '📰', name: 'News & Updates',       nameHi: 'समाचार',
-    stat: '48 articles today', color: 'from-red-500 to-rose-500', href: '/hi/news',
-    desc: 'Local to global, 22 languages',
-  },
-  {
-    id: 'fintech',   icon: '💰', name: 'FinTech & Payments',   nameHi: 'पेमेंट और बैंकिंग',
-    stat: '₹2,450 balance', color: 'from-emerald-500 to-green-600', href: '/hi/fintech',
-    desc: 'UPI, loans, insurance & more',
-  },
-  {
-    id: 'agri',      icon: '🌾', name: 'Agri-Tech',            nameHi: 'किसान और खेती',
-    stat: 'Wheat ₹2,150/qtl', color: 'from-yellow-500 to-amber-500', href: '/hi/agri',
-    desc: 'Mandi prices, weather, AI advisory',
-  },
-  {
-    id: 'shop',      icon: '🛒', name: 'Hyperlocal Shop',      nameHi: 'लोकल शॉप',
-    stat: '30-min delivery', color: 'from-orange-500 to-amber-500', href: '/hi/shop',
-    desc: 'Kirana stores near you',
-  },
-  {
-    id: 'edtech',    icon: '📚', name: 'EdTech 2.0',           nameHi: 'शिक्षा और स्किल',
-    stat: '2 courses in progress', color: 'from-indigo-500 to-blue-600', href: '/hi/edtech',
-    desc: 'Govt exams, skills, certifications',
-  },
-  {
-    id: 'health',    icon: '🏥', name: 'HealthTech',           nameHi: 'स्वास्थ्य',
-    stat: 'Appointment tomorrow', color: 'from-teal-500 to-emerald-500', href: '/hi/health',
-    desc: 'Doctors, labs, medicines',
-  },
-  {
-    id: 'creator',   icon: '🎬', name: 'Creator & Video',      nameHi: 'क्रिएटर',
-    stat: '1.2K followers', color: 'from-pink-500 to-rose-500', href: '/hi/creator',
-    desc: 'Short video, live, earn',
-  },
-  {
-    id: 'jobs',      icon: '💼', name: 'Gig & Jobs',           nameHi: 'नौकरी और गिग',
-    stat: '24 new jobs nearby', color: 'from-slate-500 to-gray-600', href: '/hi/jobs',
-    desc: 'Blue-collar, gig & verified jobs',
-  },
-  {
-    id: 'govtech',   icon: '🏛️', name: 'GovTech',              nameHi: 'सरकारी सेवाएं',
-    stat: '2 pending schemes', color: 'from-blue-700 to-indigo-700', href: '/hi/govtech',
-    desc: 'DigiLocker, schemes, RTI',
-  },
-  {
-    id: 'ev-green',  icon: '🔌', name: 'EV & Green Tech',      nameHi: 'ईवी और सोलर',
-    stat: '5 stations nearby', color: 'from-lime-500 to-green-500', href: '/hi/ev-green',
-    desc: 'EV charging, loans, solar',
-  },
-  {
-    id: 'ai',        icon: '🎤', name: 'AI Voice Assistant',   nameHi: 'AI वॉइस असिस्टेंट',
-    stat: 'Always listening', color: 'from-bharat-saffron to-bharat-orange', href: '/hi/ai',
-    desc: '22 languages, voice-first',
-  },
+  { id: 'social',   label: 'Social',       sub: 'Feed, stories & DMs',     stat: '12 new posts',      Icon: Users,       color: 'from-violet-500 to-purple-600', href: '/hi/social' },
+  { id: 'calling',  label: 'Calling',      sub: 'Free calls, works on 2G', stat: '3 missed calls',    Icon: Phone,       color: 'from-blue-500 to-cyan-500',    href: '/hi/calling' },
+  { id: 'news',     label: 'News',         sub: 'Local to global',          stat: '48 articles',       Icon: Newspaper,   color: 'from-red-500 to-rose-500',     href: '/hi/news' },
+  { id: 'fintech',  label: 'FinTech',      sub: 'UPI, loans & insurance',   stat: '₹12,450 balance',   Icon: Wallet,      color: 'from-emerald-500 to-teal-500', href: '/hi/fintech' },
+  { id: 'agri',     label: 'Agri-Tech',    sub: 'Mandi prices & advisory',  stat: 'Wheat ₹2,180/qtl',  Icon: Sprout,      color: 'from-yellow-500 to-amber-500', href: '/hi/agri' },
+  { id: 'shop',     label: 'Shop',         sub: 'Kirana stores near you',   stat: '30-min delivery',   Icon: ShoppingCart,color: 'from-orange-500 to-amber-500', href: '/hi/shop' },
+  { id: 'edtech',   label: 'EdTech',       sub: 'Govt exams & skills',      stat: '2 courses active',  Icon: BookOpen,    color: 'from-indigo-500 to-blue-600',  href: '/hi/edtech' },
+  { id: 'health',   label: 'Health',       sub: 'Doctors, labs & meds',     stat: 'Appt. tomorrow',    Icon: Heart,       color: 'from-teal-500 to-emerald-500', href: '/hi/health' },
+  { id: 'creator',  label: 'Creator',      sub: 'Short video & earn',       stat: '1.2K followers',    Icon: Video,       color: 'from-pink-500 to-rose-500',    href: '/hi/creator' },
+  { id: 'jobs',     label: 'Jobs',         sub: 'Gig & verified jobs',      stat: '24 jobs nearby',    Icon: Briefcase,   color: 'from-slate-500 to-gray-600',   href: '/hi/jobs' },
+  { id: 'govtech',  label: 'GovTech',      sub: 'DigiLocker & schemes',     stat: '2 pending',         Icon: Landmark,    color: 'from-blue-700 to-indigo-700',  href: '/hi/govtech' },
+  { id: 'ev-green', label: 'EV & Green',   sub: 'Charging & solar',         stat: '5 stations nearby', Icon: Zap,         color: 'from-lime-500 to-green-500',   href: '/hi/ev-green' },
+  { id: 'ai',       label: 'AI Assistant', sub: '22 languages, voice-first', stat: 'Always on',        Icon: Mic,         color: 'from-bharat-saffron to-bharat-orange', href: '/hi/ai' },
 ];
 
 const QUICK_STATS = [
-  { label: 'Total Balance', value: '₹12,450', icon: '💳', color: 'text-green-600' },
-  { label: 'Notifications', value: '7 new', icon: '🔔', color: 'text-orange-500' },
-  { label: 'Active Orders', value: '2 orders', icon: '📦', color: 'text-blue-500' },
-  { label: 'Health Score', value: '82/100', icon: '❤️', color: 'text-red-500' },
+  { label: 'Balance',       value: '₹12,450', Icon: CreditCard, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { label: 'Notifications', value: '7 new',   Icon: Bell,       color: 'text-bharat-saffron', bg: 'bg-orange-50' },
+  { label: 'Active Orders', value: '2',        Icon: Package,    color: 'text-blue-600',    bg: 'bg-blue-50' },
+  { label: 'Health Score',  value: '82/100',   Icon: Activity,   color: 'text-rose-500',    bg: 'bg-rose-50' },
 ];
 
-const RECENT_ACTIVITY = [
-  { icon: '💸', text: 'UPI payment to Ramesh Store', time: '2 min ago', amount: '-₹450' },
-  { icon: '📰', text: 'PM scheme announced for farmers', time: '15 min ago', amount: null },
-  { icon: '📞', text: 'Video call with Dr. Priya Sharma', time: '1 hr ago', amount: null },
-  { icon: '🌾', text: 'Wheat price updated: ₹2,150/qtl', time: '2 hr ago', amount: null },
-  { icon: '📦', text: 'Order delivered: Amul Milk 2L', time: '3 hr ago', amount: '-₹52' },
+const ACTIVITY = [
+  { Icon: Send,       text: 'UPI payment to Ramesh Store',   time: '2 min ago',  amount: '-₹450' },
+  { Icon: Newspaper,  text: 'PM scheme announced for farmers', time: '15 min ago', amount: null },
+  { Icon: Phone,      text: 'Video call with Dr. Priya Sharma', time: '1 hr ago', amount: null },
+  { Icon: Sprout,     text: 'Wheat price updated ₹2,180/qtl', time: '2 hr ago',  amount: null },
+  { Icon: Package,    text: 'Order delivered: Amul Milk 2L',  time: '3 hr ago',  amount: '-₹52' },
 ];
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-bharat-navy">
-      {/* Hero greeting */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-bharat-navy via-slate-800 to-bharat-navy px-6 pb-8 pt-6">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute left-10 top-4 h-32 w-32 rounded-full bg-bharat-saffron blur-3xl" />
-          <div className="absolute right-10 top-8 h-24 w-24 rounded-full bg-bharat-green blur-3xl" />
-        </div>
-        <div className="relative">
-          <p className="text-sm font-medium text-bharat-saffron">नमस्ते, Rahul! 👋</p>
-          <h2 className="mt-1 text-2xl font-bold text-white">Welcome to BharatApp</h2>
-          <p className="mt-0.5 text-sm text-gray-400">भारत का अपना Super App — सब कुछ एक जगह</p>
-
-          {/* Quick stats row */}
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {QUICK_STATS.map((stat) => (
-              <div key={stat.label} className="rounded-xl bg-white/10 px-3 py-3 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{stat.icon}</span>
-                  <div>
-                    <p className={`text-base font-bold ${stat.color}`}>{stat.value}</p>
-                    <p className="text-xs text-gray-400">{stat.label}</p>
-                  </div>
+    <div className="min-h-screen">
+      {/* Hero banner */}
+      <div className="relative overflow-hidden">
+        <Image
+          src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1400&q=80"
+          alt="India cityscape"
+          width={1400}
+          height={320}
+          className="h-56 w-full object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-bharat-navy/90 via-bharat-navy/70 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-end px-6 pb-6">
+          <p className="text-sm font-semibold text-bharat-saffron">नमस्ते, Rahul 👋</p>
+          <h2 className="mt-0.5 text-2xl font-bold text-white">Welcome to BharatApp</h2>
+          <p className="mt-0.5 text-sm text-gray-300">भारत का अपना Super App — सब कुछ एक जगह</p>
+          {/* Quick stats */}
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {QUICK_STATS.map((s) => (
+              <div key={s.label} className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2.5 backdrop-blur-sm ring-1 ring-white/10">
+                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${s.bg}`}>
+                  <s.Icon size={16} className={s.color} />
+                </div>
+                <div>
+                  <p className={`text-sm font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-[10px] text-gray-300">{s.label}</p>
                 </div>
               </div>
             ))}
@@ -114,57 +72,59 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="px-4 py-6 sm:px-6">
+      <div className="px-4 py-5 sm:px-6">
         {/* AI Voice CTA */}
-        <Link href="/hi/ai" className="mb-6 flex items-center gap-4 rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-4 shadow-sm transition hover:shadow-md dark:border-orange-800 dark:from-orange-900/20 dark:to-amber-900/10">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-bharat-saffron to-bharat-orange text-2xl shadow-md">
-            🎤
+        <Link
+          href="/hi/ai"
+          className="mb-5 flex items-center gap-4 rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-orange-800 dark:from-orange-900/20 dark:to-amber-900/10"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-bharat-saffron to-bharat-orange shadow-lg">
+            <Mic size={22} className="text-white" strokeWidth={2} />
           </div>
           <div className="flex-1">
             <p className="font-semibold text-gray-800 dark:text-white">Bolo Bharat! बोलो भारत!</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Tap to speak in any Indian language</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Tap to speak in any Indian language</p>
           </div>
-          <div className="flex h-9 items-center rounded-full bg-bharat-saffron px-4 text-sm font-semibold text-white shadow-sm">
-            Speak →
+          <div className="flex items-center gap-1.5 rounded-full bg-bharat-saffron px-4 py-2 text-sm font-semibold text-white shadow-sm">
+            Speak <ArrowRight size={14} />
           </div>
         </Link>
 
-        {/* Module grid */}
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">All Services</h3>
+        {/* Modules grid */}
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">All Services</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {MODULES.map((mod) => (
             <Link
               key={mod.id}
               href={mod.href}
-              className="group relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:bg-gray-800"
+              className="group relative overflow-hidden rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur-sm ring-1 ring-orange-100/40 transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:ring-orange-200 dark:bg-white/5 dark:ring-white/10"
             >
-              {/* Gradient accent strip */}
-              <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${mod.color}`} />
-              <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${mod.color} text-xl shadow-sm`}>
-                {mod.icon}
+              <div className={`absolute left-0 top-0 h-[3px] w-full bg-gradient-to-r ${mod.color}`} />
+              <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${mod.color} shadow-sm`}>
+                <mod.Icon size={18} className="text-white" strokeWidth={2} />
               </div>
-              <p className="text-sm font-semibold text-gray-800 dark:text-white">{mod.name}</p>
-              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{mod.desc}</p>
-              <p className="mt-2 text-xs font-medium text-bharat-saffron">{mod.stat}</p>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{mod.label}</p>
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{mod.sub}</p>
+              <div className="mt-2 flex items-center gap-1">
+                <TrendingUp size={10} className="text-bharat-saffron" />
+                <p className="text-[11px] font-medium text-bharat-saffron">{mod.stat}</p>
+              </div>
             </Link>
           ))}
         </div>
 
         {/* Recent activity */}
         <div className="mt-6">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Recent Activity</h3>
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-800">
-            {RECENT_ACTIVITY.map((item, i) => (
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Recent Activity</p>
+          <div className="overflow-hidden rounded-2xl bg-white/80 shadow-sm ring-1 ring-orange-100/40 backdrop-blur-sm dark:bg-white/5 dark:ring-white/10">
+            {ACTIVITY.map((item, i) => (
               <div
                 key={i}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3',
-                  i < RECENT_ACTIVITY.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''
-                )}
+                className={`flex items-center gap-3 px-4 py-3 ${i < ACTIVITY.length - 1 ? 'border-b border-orange-50 dark:border-white/5' : ''}`}
               >
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-base dark:bg-gray-700">
-                  {item.icon}
-                </span>
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-orange-50 dark:bg-white/5">
+                  <item.Icon size={16} className="text-bharat-saffron" strokeWidth={1.8} />
+                </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-gray-700 dark:text-gray-200">{item.text}</p>
                   <p className="text-xs text-gray-400">{item.time}</p>
@@ -176,11 +136,28 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+
+        {/* Promo video banner */}
+        <div className="mt-6 overflow-hidden rounded-2xl bg-gradient-to-r from-bharat-navy to-slate-800 shadow-lg">
+          <div className="relative h-36">
+            <Image
+              src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
+              alt="India countryside"
+              fill
+              className="object-cover opacity-40"
+            />
+            <div className="absolute inset-0 flex items-center justify-between px-6">
+              <div>
+                <p className="text-xs font-semibold text-bharat-saffron uppercase tracking-wider">BharatApp Story</p>
+                <p className="mt-1 text-lg font-bold text-white">One app for<br />every Indian</p>
+              </div>
+              <button className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 ring-2 ring-white/40 backdrop-blur-sm transition hover:bg-white/30">
+                <Play size={22} className="ml-1 text-white" fill="white" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }
